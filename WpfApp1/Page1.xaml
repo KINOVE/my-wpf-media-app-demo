@@ -1,0 +1,149 @@
+﻿<Page
+    x:Class="WpfApp1.Page1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:this="clr-namespace:WpfApp1"
+    Title="Page1"
+    d:DesignHeight="1080"
+    d:DesignWidth="1920"
+    d:MinHeight="900"
+    d:MinWidth="550"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <this:TimeConverter x:Key="TimeConverter" />
+        <this:SubConverter x:Key="SubConverter" />
+
+        <RoutedCommand x:Key="ShortKey_FastForward" />
+        <RoutedCommand x:Key="ShortKey_FastRewind" />
+        <RoutedCommand x:Key="ShortKey_PlayOrPause" />
+    </Page.Resources>
+
+    <Page.CommandBindings>
+        <CommandBinding Command="{StaticResource ShortKey_FastForward}" Executed="CustomCommand_FastForward" />
+        <CommandBinding Command="{StaticResource ShortKey_FastRewind}" Executed="CustomCommand_FastRewind" />
+        <CommandBinding Command="{StaticResource ShortKey_PlayOrPause}" Executed="CustomCommand_PlayOrPause" />
+    </Page.CommandBindings>
+
+    <Page.InputBindings>
+        <KeyBinding Key="Right" Command="{StaticResource ShortKey_FastForward}" />
+        <KeyBinding Key="Left" Command="{StaticResource ShortKey_FastRewind}" />
+        <KeyBinding Key="Space" Command="{StaticResource ShortKey_PlayOrPause}" />
+    </Page.InputBindings>
+
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        Background="Blue"
+        FocusManager.FocusedElement="{Binding ElementName=playOrPause}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid
+            Name="mediaGrid"
+            Grid.Row="0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="Black">
+            <MediaElement
+                Name="myMediaElement"
+                Width="{Binding ElementName=mediaGrid, Path=ActualWidth}"
+                Height="{Binding ElementName=mediaGrid, Path=ActualHeight}"
+                LoadedBehavior="Manual"
+                MediaOpened="Media_Opened"
+                MouseLeftButtonUp="myMediaElement_MouseLeftButtonUp"
+                RenderTransformOrigin="0.5,0.5"
+                ScrubbingEnabled="True"
+                UnloadedBehavior="Stop" />
+            <!--  Width="800" Height="450"  -->
+        </Grid>
+
+
+
+        <StackPanel
+            Grid.Row="1"
+            Height="100"
+            Background="Black">
+
+
+            <StackPanel
+                Width="{Binding ElementName=mediaGrid, Path=ActualWidth}"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Slider
+                    Name="timelineSlider"
+                    Width="{Binding ElementName=mediaGrid, Path=ActualWidth, Converter={StaticResource SubConverter}, ConverterParameter=20}"
+                    Margin="10"
+                    Focusable="False"
+                    IsMoveToPointEnabled="False"
+                    IsSnapToTickEnabled="True"
+                    PreviewMouseDown="timelineSlider_PreviewMouseDown"
+                    Thumb.DragCompleted="sd_cursorTime_DragCompleted"
+                    Thumb.DragDelta="sd_cursorTime_DragDelta"
+                    Thumb.DragStarted="sd_cursorTime_DragStarted"
+                    TickFrequency="1" />
+                <!--    -->
+                <!--  ValueChanged="SeekToMediaPosition"  -->
+                <!--  Value="{Binding ElementName=myMediaElement, Path=Position, Converter={StaticResource TimeConverter}, Mode=TwoWay}"  -->
+                <!--  Value="{Binding ElementName='myMediaElement', Path=Position.TotalMilliseconds, Mode=OneWay, StringFormat='{}{0}'}"  -->
+            </StackPanel>
+
+
+            <StackPanel
+                Width="{Binding ElementName=mediaGrid, Path=ActualWidth}"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+
+
+                <TextBlock
+                    Width="200"
+                    VerticalAlignment="Center"
+                    Block.TextAlignment="Center"
+                    FontSize="17"
+                    Foreground="White">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} / {1}">
+                            <Binding
+                                ElementName="timelineSlider"
+                                Mode="TwoWay"
+                                Path="Value" />
+                            <Binding
+                                ElementName="timelineSlider"
+                                Mode="TwoWay"
+                                Path="Maximum" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+                <Button
+                    Name="playOrPause"
+                    Margin="5"
+                    Padding="10"
+                    Click="media_PlayOrPause"
+                    Content="播放"
+                    Focusable="True" />
+
+                <Button
+                    Name="button"
+                    Margin="5"
+                    Padding="10"
+                    Click="media_Switch"
+                    Content="更换"
+                    Focusable="False" />
+
+                <Button
+                    Name="SettingButton"
+                    Margin="5"
+                    Padding="10"
+                    Click="OpenSettingWindow"
+                    Content="设置"
+                    Focusable="False" />
+
+            </StackPanel>
+        </StackPanel>
+
+
+    </Grid>
+</Page>
